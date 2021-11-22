@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Deployable Secrets Scanner</title>
+    	<meta charset="utf-8">
+    	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+    <!-- Load fonts style after rendering the layout styles -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;200;300;400;500;700;900&display=swap">
+	<link rel="stylesheet" href="{{ url_for('static', filename='assets/css/fontawesome.min.css') }}">
+
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"> 
+	<link rel="stylesheet" href="{{ url_for('static', filename='assets/css/bootstrap.min.css') }}">
+	<link rel="stylesheet" href="{{ url_for('static', filename='assets/css/templatemo.css') }}">
+
+	
+
+</head>
+
+<body>
+
+    <!-- Header -->
+    <nav class="navbar navbar-expand-lg navbar-light shadow">
+        <div class="container d-flex justify-content-between align-items-center">
+
+            <a class="navbar-brand text-success logo h1 align-self-center" href="/">
+               
+		<img src="{{url_for('static', filename='assets/img/kpmg_logo.jpg')}}"  />
+            </a>
+
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#templatemo_main_nav" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="align-self-center collapse navbar-collapse flex-fill  d-lg-flex justify-content-lg-between" id="templatemo_main_nav">
+                <div class="flex-fill">
+                    <ul class="nav navbar-nav d-flex justify-content-between mx-lg-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('previous_results')}}">Results</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html">Contact</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </nav>
+    <!-- Close Header -->
+    
+    <!-- TODO -->
+
+    
+    <section class="container py-5">
+        <!-- Title -->
+        <div class="row text-center pt-3">
+            <div class="col-lg-6 m-auto">
+                <h1 class="h1">Secret Scanner</h1>
+                <p>
+                    Please complete fields below and click scan.
+                </p>
+            </div>
+        </div>
+        <!-- End Title -->
+        
+        <div>
+            <div id="form2" class="scanner">      
+                <!-- Main Input For Receiving Query to our ML -->
+
+                <h1>Secret Scanning</h1>
+                <a href="{{ url_for('previous_results')}}">Previous Results</a>
+                
+                <form action="{{ url_for('scan')}}" id="scan_form" method="post">
+                    <div>
+                        <!-- I think this error message can be used for other purposes (such as userid/password fail) -->
+                        <div class="gitscan_form_temp" id="jerror" style="color: red; display: none">Error found in one or more fields below</div>
+                        
+                        <!-- Make this less wide and/or smaller font-->
+                        <label for="userid">User ID</label><input type="text" name="userid" autofocus/>
+                        <label for="password">Password/Token</label><input type="password" name="password" />	
+                        <label for="report_recipients">Email Report Recipients</label><input type="email" multiple name="report_recipients" value=""/><br/>
+                        <input type="checkbox" name="entropy" id="entropy_id"/>
+                        <label for="entropy_id">Use Entropy</label><span style="margin: 3px;"><a href="https://github.com/trufflesecurity/truffleHog" target="_blank" rel="noopener noreferrer">Learn More</a></span>
+                        <br/>
+                        <input type="checkbox" name="rescan" id="rescan_id" checked/>
+                        <label for="rescan_id">Rescan Previously Scanned Repos</label>
+                    </div>
+                    
+                    <br/>
+                    
+                    <h3>Git Source</h3>
+                    <div>
+                        <!-- Make this two columns, Left=radio, Right=form-->
+                        <div class="container">
+                            <div class="row">
+                                <!-- Radio Buttons -->
+                                <div class="col">
+                                    <!-- Which Git Source? -->
+
+                                        <input type="radio" id="github" name="gitgroup" value="github" checked>
+                                        <label for="github">Github</label>
+                                        <br/>
+                                        <input type="radio" id="bitbucket" name="gitgroup" value="bitbucket">
+                                        <label for="bitbucket">Bitbucket</label>
+                                        <br/>
+                                        <input type="radio" id="gitlab" name="gitgroup" value="gitlab">
+                                        <label for="gitlab">Gitlab</label>
+                                        <br/>
+                                        <input type="radio" id="azure" name="gitgroup" value="azure">
+                                        <label for="azure">Azure DevOps</label>
+                                        <br/>
+                                        <input type="radio" id="generic" name="gitgroup" value="generic">
+                                        <label for="generic">Generic Git</label>
+                                </div>
+                                <!-- Form and Submit -->
+								<div class="col gitwrap">
+									<div class="gitscan_form_temp" id="scan_err" style="color: red; display: none">
+										<strong>Error:</strong><span id="err_msg"></span>
+									</div>
+
+									<div class="gitscan_form gitlab bitbucket" id="baseUrl" style="display: none;">
+										<label id="baseUText" for="url">Server URL:</label><br />
+										<input type="text" name="url" id="BGurl" /><br />
+                                        <br />
+									</div>
+									<div class="gitscan_form github" id="orgsG">
+										<label id="gOrgs" for="github_orgs">Github Orgs</label><br />
+										<textarea name="github_orgs" rows="5" cols="30" id="otext"></textarea>
+										<br />
+									</div>
+									<div class="gitscan_form github" id="usersG">
+										<label id="gUsers" for="github_users">Github Users</label><br />
+										<textarea name="github_users" rows="5" cols="30" id="utext"></textarea>
+										<br />
+									</div>
+									<div class="gitscan_form azure" style="display: none;">
+										<label for="azure_organization">Azure Organization</label><br />
+										<input type="text" name="azure_organization" id="azure_organization"/><br />
+										<br />
+									</div>
+									<div class="gitscan_form generic" id="urlsG" style="display: none;">
+										<label id="gUrls" for="git_urls">Git URLs</label><br />
+										<textarea name="git_urls" rows="10" cols="60" id="gtext"></textarea>
+									</div>
+									
+                                    <div id="loading_scan"><span id="scanning_msg" style="display: none;">Scanning...</span><button id="scan_button" type="submit" name="button" value="github" class="btn btn-primary btn-block btn-large" style="padding-left: 30px; padding-right: 30px; margin-left: 30px;">Scan</button></div>
+                                </div>
+							</div>
+                        </div>
+                    </div>
+                </form>
+                <!-- Email Config -->
+                <div>
+                    <div>
+                        <button type="submit" id='btn_config' name="button" class="btn btn-primary btn-block btn-large" onclick='toggle_config(this)'>Show Configuration</button>
+                    </div>
+                    <div id="config" style="display:none;">
+                        <form id='settings' name='settings' action="{{ url_for('config')}}" method="post">
+                        	<label for="report_directory">Report Directory</label><input type="text" name="report_directory" value="{{ report_dir }}"/><br/>					
+                            <label for="page_size">Page Size</label><input type="text" name="page_size" value="{{ page_size }}"/><br/>
+                            <label for="processing_threads">Processing Threads</label><input type="text" name="processing_threads" value="{{ processing_threads }}"/><br/>
+                            <label for="email_server">SMTP Server (required)</label><input type="text" name="email_server" required value="{{ email_server }}"/>
+                            <label for="email_server_port">SMTP Port (required)</label><input type="text" name="email_server_port" required value="{{ email_server_port }}" />
+                            <label for="email_from">From Address (required)</label><input type="text" name="email_from" required value="{{ email_from }}"/>
+                            <label for="email_userid">SMTP User ID</label><input type="text" name="email_userid" value="{{ email_userid }}"/>
+                            <label for="email_password">SMTP Password</label><input type="password" name="email_password" value="{{ email_password }}"/>
+                            <button type="submit" name="button" class="btn btn-primary btn-block btn-large">
+                                Save Settings
+                            </button>
+                        </form>
+                    </div>
+                </div>
+        </div>
+       
+    </section>
+    <!-- End Categories of The Month -->
+
+    <!-- Start Footer -->
+    <footer class="bg-dark" id="tempaltemo_footer">
+        <div class="container">
+            <div class="row">
+
+                <div class="col-md-4 pt-5">
+                    <h2 class="h2 text-success border-bottom pb-3 border-light logo">KPMG</h2>
+                    <ul class="list-unstyled text-light footer-link-list">
+                        <li>
+                            <i class="fas fa-map-marker-alt fa-fw"></i>
+                            123 KPMG 12345
+                        </li>
+                        <li>
+                            <i class="fa fa-phone fa-fw"></i>
+                            <a class="text-decoration-none" href="tel:123-456-7890">123-456-7890</a>
+                        </li>
+                        <li>
+                            <i class="fa fa-envelope fa-fw"></i>
+                            <a class="text-decoration-none" href="mailto:secretscanner@kpmg.com">secretscanner@kpmg.com</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="col-md-4 pt-5">
+                    <h2 class="h2 text-light border-bottom pb-3 border-light">Products</h2>
+                    <ul class="list-unstyled text-light footer-link-list">
+                        <li><a class="text-decoration-none" href="#">TruffleHog</a></li>
+
+                    </ul>
+                </div>
+
+                <div class="col-md-4 pt-5">
+                    <h2 class="h2 text-light border-bottom pb-3 border-light">Further Info</h2>
+                    <ul class="list-unstyled text-light footer-link-list">
+                        <li><a class="text-decoration-none" href="#">Home</a></li>
+                        <li><a class="text-decoration-none" href="#">Scan</a></li>
+                        <li><a class="text-decoration-none" href="#">Results</a></li>
+                        <li><a class="text-decoration-none" href="#">FAQs</a></li>
+                        <li><a class="text-decoration-none" href="#">Contact</a></li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <div class="row text-light mb-4">
+                <div class="col-12 mb-3">
+                    <div class="w-100 my-3 border-top border-light"></div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="w-100 bg-black py-3">
+            <div class="container">
+                <div class="row pt-2">
+                    <div class="col-12">
+                        <p class="text-left text-light">
+                            Copyright &copy; 2021 KPMG 
+                
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </footer>
+    <!-- End Footer -->
+
+    <!-- Start Script -->
+    <script src="{{url_for('static', filename='assets/js/jquery-3.6.0.min.js')}}"></script>
+    <script src="{{url_for('static', filename='assets/js/bootstrap.bundle.min.js')}}"></script>
+    <script src="{{url_for('static', filename='assets/js/templatemo.js')}}"></script>
+    <script src="{{url_for('static', filename='assets/js/dss.js')}}"></script>
+    <script>
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+    </script>
+    
+    <!-- End Script -->
+
+</body>
+</html>

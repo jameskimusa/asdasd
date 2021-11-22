@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title>Deployable Secrets Scanner</title>
+	<link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
+	<link href='https://fonts.googleapis.com/css?family=Arimo' rel='stylesheet' type='text/css'>
+	<link href='https://fonts.googleapis.com/css?family=Hind:300' rel='stylesheet' type='text/css'>
+	<link href='https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+	<link rel="stylesheet" href="{{ url_for('static', filename='assets/css/bootstrap.min.css') }}">
+	<link rel="stylesheet" href="{{ url_for('static', filename='/assets/css/fontawesome.min.css') }}">
+	<link rel="stylesheet" href="{{ url_for('static', filename='assets/css/templatemo.css') }}">
+	<script src="{{url_for('static', filename='assets/js/jquery-3.6.0.min.js')}}"></script>
+	<script src="{{url_for('static', filename='assets/js/bootstrap.bundle.min.js')}}"></script>
+	<script src="{{url_for('static', filename='assets/js/templatemo.js')}}"></script>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.1/dist/chart.min.js"></script>
+
+
+	<script src="https://www.koolchart.com/demo/LicenseKey/codepen/KoolChartLicense.js"></script>
+	<script src="https://www.koolchart.com/demo/KoolChart/JS/KoolChart.js"></script>
+	<link rel="stylesheet" href="https://www.koolchart.com/demo/KoolChart/Assets/Css/KoolChart.css"/>
+</head>
+
+<body>
+	<!-- Header -->
+    <nav class="navbar navbar-expand-lg navbar-light shadow">
+        <div class="container d-flex justify-content-between align-items-center">
+
+            <a class="navbar-brand text-success logo h1 align-self-center" href="/">
+               
+		<img src="{{url_for('static', filename='assets/img/kpmg_logo.jpg')}}"  />
+            </a>
+
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#templatemo_main_nav" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="align-self-center collapse navbar-collapse flex-fill  d-lg-flex justify-content-lg-between" id="templatemo_main_nav">
+                <div class="flex-fill">
+                    <ul class="nav navbar-nav d-flex justify-content-between mx-lg-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/">Home</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('previous_results')}}">Results</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html">Contact</a>
+                        </li>
+                    </ul>
+                </div>
+                
+            </div>
+
+        </div>
+    </nav>
+	<!-- Close Header -->
+	<!--
+    Title - Download 
+    Urls scanned
+      How
+    Urls skipped
+      How
+    Findings
+    URL and Branch
+      Commit
+      Commit Hash
+      Date Path
+      Print Diff
+  -->
+	<!--Title Area-->
+	<div class="bg-light">
+		<div class="results row">
+			<div class="col-md-2"></div>
+			<div class="col-md-8">
+				<h1 id="result_head">Secret Scanning Results</h1> </div>
+			<div class="col-md-2">
+				<form id="download" action="{{ url_for('download', scan_num=scan_num)}}" method="post">
+					<button type="submit" class="btn btn-primary btn-block btn-large" style="font-size: small"> Download Report CSV </button>
+				</form>
+			</div>
+		</div>
+		<!--End Title Area-->
+
+		<div class="charts">
+			<div class="container-fluid">
+				<div class="row content">
+					<h4>Analytics Dashboards</h4>
+					<div class="col-sm-12 col-md-12 col-lg-12" id="contemt-main">
+						<div class="row justify-content-center">
+                          
+							<div class="col-sm-1 col-md-1 col-lg-1 mb-5">
+							</div>                          
+
+							<div class="col-sm-2 col-md-2 col-lg-2 mb-5" style="border-style: solid; border-width:2px; border-color: #FFFFFF; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+								<h5> Total Findings: </h5>
+									<h3 style="font-size:120px; left: 50%">{{count}}</h3>
+							</div>
+                          
+							<div class="col-sm-1 col-md-1 col-lg-1 mb-5">
+							</div>    
+                          
+							<div class="col-sm-3 col-md-3 col-lg-3 mb-5" style="border-style: solid; border-width:2px; border-color: #FFFFFF; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+								<h5> Findings by Category </h5>
+								<canvas id="myChart" width="300" height="300"></canvas>  
+							</div>
+                          
+							<div class="col-sm-1 col-md-1 col-lg-1 mb-5">
+							</div>                           
+
+							<div class="col-sm-3 col-md-3 col-lg-3 mb-5" style="border-style: solid; border-width:2px; border-color: #FFFFFF; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+								<h5> Secret Findings by Category </h5>
+								<canvas id="pie-chart" width="300" height="300"></canvas>  
+							</div>
+							<div class="col-sm-1 col-md-1 col-lg-1 mb-5">
+							</div>  
+
+							<div class="col-sm-3 col-md-3 col-lg-3 mb-5" style="border-style: solid; border-width:2px; border-color: #FFFFFF; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+								<h5> Secret Findings by Date</h5>
+								<canvas id="line-graph" width="300" height="300"></canvas>  
+							</div>
+							<div class="col-sm-1 col-md-1 col-lg-1 mb-5">
+							</div>  
+							
+							<div class="col-sm-3 col-md-3 col-lg-3 mb-5" style="border-style: solid; border-width:2px; border-color: #FFFFFF; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+								<h5> Word Cloud</h5>
+								<div id="chartHolder" style="width:100%; height:500px;"></div>
+							</div>
+							<div class="col-sm-1 col-md-1 col-lg-1 mb-5">
+							</div>  
+
+
+						</div>
+					</div>	
+				</div>
+
+		
+
+
+
+		<!-- Findings -->
+		<div class="findings">
+			<div>
+				<h4>URLs</h4>
+				<div class="accordion-item">
+					<!-- URLs scanned -->
+					<h2 class="accordion-header" id="heading_scan">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#scanned_collapse" aria-expanded="true" aria-controls="scanned_collapse">
+              URLs Scanned
+            </button>
+          </h2>
+					<div id="scanned_collapse" class="accordion-collapse collapse show" aria-labelledby="heading_scan">
+						<div class="accordion-body"> {% if not scanned_urls %} None {% else %}
+							<table class="table table-bordered table-light">
+								<tbody> {% for url in scanned_urls %}
+									<tr>
+										<td><a href="#">{{ url }}</a></td>
+									</tr> {% endfor %} </tbody>
+							</table> {% endif %} </div>
+					</div>
+					<!-- URLs Skipped -->
+					<h2 class="accordion-header" id="heading_skip">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#skipped_collapse" aria-expanded="false" aria-controls="skipped_collapse">
+              URLs Skipped
+            </button>
+          </h2>
+					<div id="skipped_collapse" class="accordion-collapse collapse" aria-labelledby="heading_skip">
+						<div class="accordion-body"> {% if not skipped_urls %} None {% else %}
+							<table class="table table-bordered table-light">
+								<tbody> {% for url in skipped_urls %}
+									<tr>
+										<td><a href="#">{{ url }}</a></td>
+									</tr> {% endfor %} </tbody>
+							</table> {% endif %} </div>
+					</div>
+				</div>
+			</div>
+			<br/>
+			<div class="list_find">
+				{% set count = namespace(value=0) %}
+				<div class="row">
+					<div class="col-md-10">
+						<h4>Found in:</h4></div>
+					<div class="col-md-2"></div>
+				</div> {% for key, value in scan_results.items() %} {% if value['findings'] is defined and value['findings'] | length > 0 %}
+				
+				<!-- ADD ACCORDION HERE-->
+				<div class="accordion-item" id="acc{{ count.value }}">
+					<!-- Accordion Head -->
+					<h2 class="accordion-header" id="accordionhead{{ count.value }}">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#accordion{{ count.value }}" aria-expanded="true" aria-controls="accordion{{ count.value }}">
+              {{ key }}
+            </button>
+          </h2>
+					<!-- Table/Accordion content Starts here -->
+					<div id="accordion{{ count.value }}" class="accordion-collapse collapse" aria-labelledby="accordionhead{{ count.value }}" data-bs-parent="#acc{{ count.value }}">
+						<div class="accordion-body">
+							<div class="row">
+								<div class="col-md-10"></div>
+								<div class="col-md-2">
+									<!-- Expand/Collapse all buttons-->
+									<div style="text-align: right;"><a data-bs-toggle="collapse" href=".collapseExample">Expand/Collapse All</a></div>
+								</div>
+							</div>
+							<table class="table table-bordered table-light table-striped">
+								<!-- Table Heading -->
+								<thead>
+									<tr>
+										<th class="col-6">Path</th>
+										<th class="col-5">Reason</th>
+										<th class="col-1">Toggle</th>
+									</tr>
+								</thead>
+								<tbody> {% for v in value['findings'] %}
+									{% set count.value = count.value + 1 %}
+									<!-- Identifier -->
+									<tr>
+										<td style="vertical-align: middle;">{{ v.path }}</td>
+										<td style="vertical-align: middle;">{{ v.reason }}</td>
+										<td style="text-align: center;"><a data-bs-toggle="collapse" href="#collapse{{ count.value }}">More...</a></td>
+									</tr>
+									<tr>
+										<!-- Collapsed item -->
+										<td colspan="3" class="collapse collapseExample" id="collapse{{ count.value }}">
+											<h5><b>URL:</b></h5>
+											<p><a href="{{ key }}">{{ key }}</a></p>
+											<h5><b>Branch:</b></h5>
+											<p>{{ v.branch }}</p>
+											<h5><b>Commit:</b></h5>
+											<p>{{ v.commit }}</p>
+											<h5><b>Commit Hash:</b></h5>
+											<p>{{ v.commitHash }}</p>
+											<h5><b>Date:</b></h5>
+											<p>{{ v.date }}</p>
+											<h5><b>Print Diff:</b></h5>
+											<p>{{ v.printDiff }}</p>
+											<h5><b>Strings Found:</b></h5>
+											<p>{{ v.stringsFound }}</p>
+										</td>
+									</tr> {% endfor %} </tbody>
+							</table>
+						</div>
+					</div>
+					<!-- Table Ends here -->
+				</div> {% endif %} {% endfor %}
+				<!-- END ACCORDION HERE -->
+			</div>
+		</div>
+	</div>
+	</div>
+	<!-- Scripts below -->
+	<!-- Bar Graph START-->
+
+	<script>
+		var myBarChart= new Chart(document.getElementById("myChart"), {
+		type: 'bar',
+		data: {
+		  labels: [{% for item in reason_category %}
+		  "{{item}}",
+		  {% endfor %}],
+		  datasets: [{
+			label: "Category",
+			backgroundColor: ['rgba(255, 99, 132, 0.2)', 'rgba(54, 162, 235, 0.2)', 'rgba(255, 206, 86, 0.2)', 'rgba(75, 192, 192, 0.2)', 'rgba(153, 102, 255, 0.2)', 'rgba(255, 99, 132, 0.3)'],
+			borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)', 'rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)', 'rgba(255, 99, 132, 2)'],
+			borderWidth: 1,
+			data: {{data}}
+		  }]
+		},
+		options: {
+			title: {
+				display: true,
+				text: "Secrets Findings by Category"
+			},
+			scales: {
+				y: {
+					beginAtZero: true
+				}
+			}
+		}
+	});
+	</script>
+
+<script>
+	var myPieChart= new Chart(document.getElementById("pie-chart"), {
+		type: 'doughnut',
+		data: {
+		  labels: [{% for item in reason_category %}
+		  "{{item}}",
+		  {% endfor %}],
+		  datasets: [{
+			label: "Category",
+			backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850", "#92a8d1"],
+			data: {{data}}
+		  }]
+		},
+		options: {
+		  title: {
+			display: true,
+			text: 'Findings by Category'
+		  }
+		}
+	});
+	</script>
+	<!-- Bar Graph END -->
+
+	<script>
+		//these are the arrays that I will fill dynamically. Labels will be my months and data will be the weight
+		
+		var labels = ["a","b","c"]; 
+		var data = [1,2,3];
+		
+		var ctx = document.getElementById('line-graph').getContext('2d');
+		var chart = new Chart(ctx, {
+			// The type of chart we want to create
+			type: 'line',
+		
+			// The data for our dataset
+			data: {
+				labels: [{% for item in date_labels %}
+			  "{{item}}",
+			  {% endfor %}],
+				datasets: [{
+					backgroundColor: 'rgba(255, 119, 0, 0.5)',
+					borderColor: 'rgba(255, 119, 0, 1)',
+					data: {{date_data}}
+				}]
+			},
+		
+			// Configuration options go here
+			options: {
+				legend: {
+					display: false
+				},
+				scales: {
+					yAxes: [{
+						ticks: {
+							beginAtZero: true
+						}
+					}]
+				}
+			}
+		});
+			
+		
+		</script>
+
+
+<script>
+
+	var chartVars = "KoolOnLoadCallFunction=chartReadyHandler";
+	
+	KoolChart.create("chart1", "chartHolder", chartVars, "100%", "100%");
+	
+	function chartReadyHandler(id) {
+	  document.getElementById(id).setLayout(layoutStr);
+	  document.getElementById(id).setData(makeData());
+	  setTimeout(changeData, 3000);
+	}
+	
+	var layoutStr =
+	  '<KoolChart backgroundColor="#FFFFFF"  borderStyle="none" fontFamily="Noto Sans">'
+	   +'<Options>'
+		+'<Caption text="Changes data every 2 seconds"/>'
+	   +'</Options>'
+	   +'<WordCloudChart showDataTips="true">'
+		+'<series>'
+		 +'<WordCloudSeries textField="text" weightField="weight">'
+		  +'<showDataEffect>'
+		   +'<SeriesInterpolate duration="1000"/>'
+		  +'</showDataEffect>'
+		  +'<fills>'
+		   +'<SolidColor color="#5586a4"/>'
+		   +'<SolidColor color="#40b2e6"/>'
+		   +'<SolidColor color="#ffa123"/>'
+		   +'<SolidColor color="#595c7b"/>'
+		   +'<SolidColor color="#ef8075"/>'
+		   +'<SolidColor color="#f8ba03"/>'
+		   +'<SolidColor color="#03b79a"/>'
+		   +'<SolidColor color="#a5d4e6"/>'
+		   +'<SolidColor color="#b79d7c"/>'
+		   +'<SolidColor color="#9e589e"/>'
+		  +'</fills>'
+		 +'</WordCloudSeries>'
+		+'</series>'
+	   +'</WordCloudChart>'
+	  +'</KoolChart>';
+	
+	function changeData(){
+	  document.getElementById("chart1").setData(makeData());
+	  setTimeout(changeData, 2000);
+	 }
+	
+	 function makeData(){
+	  var i, n,
+	   chartData = [],
+	   data = [{% for item in df3 %}
+		  "{{item}}",
+		  {% endfor %}];
+	  
+	  for(i = 0, n = data.length ; i < n ; i += 1){
+	   chartData.push({
+		text : data[i],
+		weight : 3
+	   });
+	  }
+	  return chartData;
+	 };
+	
+	
+	</script>
+
+</body>
+
+</html>
+

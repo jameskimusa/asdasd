@@ -1,0 +1,11 @@
+.git
+.gitignore
+.project
+.pydevproject
+build_docker.sh
+run_docker.sh
+certificates
+tmp
+src/__pycache__
+src/config.ini
+src/scans.sqlite3

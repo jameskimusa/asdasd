@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Deployable Secrets Scanner</title>
+  <link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Arimo' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Hind:300' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300' rel='stylesheet' type='text/css'>
+
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/bootstrap.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='/assets/css/fontawesome.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/templatemo.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+</head>
+
+<body>
+    <!-- Header -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container d-flex justify-content-between align-items-center">
+            <a class="navbar-brand text-success logo h1 align-self-center" href="index.html">
+                <img src="{{url_for('static', filename='assets/img/kpmg_logo.jpg')}}"  />
+            </a>
+
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#templatemo_main_nav" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="align-self-center collapse navbar-collapse flex-fill  d-lg-flex justify-content-lg-between" id="templatemo_main_nav">
+                <div class="flex-fill">
+                    <ul class="nav navbar-nav d-flex justify-content-between mx-lg-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('previous_results')}}">Results</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html">Contact</a>
+                        </li>
+                    </ul>
+                </div>
+                
+            </div>
+        </div>
+    </nav>
+    <!-- Close Header -->
+
+  <!--Title Area-->
+	<div class="bg-light">
+		<div class="results row">
+      <div  class="col-md-2"></div>
+      <div class="col-md-8">
+        <h1 id="result_head">Secret Scanning Progress</h1>
+      </div> 
+      </div>
+    </div>
+    <!--End Title Area-->
+	<div class="findings scanner">
+		<form name="hidden" id="hidden_form">
+			<input type="hidden" name="scan_num" value="{{ scan_num }}" />
+		</form>
+		<div id="scan_info" class="row">
+			<div class="col-sm-4"><h5>Scan Number:</h5> <span id="scan_num"></span> </div>
+			<div class="col-sm-4"><h5>Scan Type:</h5> <span id="scan_type"></span> </div>
+			<div class="col-sm-4"><h5>Status:</h5> <span id="status"></span> </div>
+		</div>
+		<div iclass="row">
+			<div class="col-sm-12">&nbsp;</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-4"><h5>Started:</h5> <span id="started"></span> </div>
+			<div class="col-sm-4"><h5>Completed:</h5> <span id="completed"></span> </div>
+			<div class="col-sm-4"><h5>Elapsed:</h5> <span id="elapsed"></span> </div>
+		</div>
+		<div iclass="row">
+			<div class="col-sm-12">&nbsp;</div>
+		</div>
+		<div><h5>Threads:</h5>
+			<div id="thread_info">
+			
+			</div>
+		</div>
+		<div id="report" style="display:none">
+			<div class="row">
+				<div class="col-sm-8"></div>
+				<div class="col-sm-4"><a href="{{ url_for('results', scan_num=scan_num)}}"><button class="btn btn-primary btn-block btn-large" style="padding-left: 30px; padding-right: 30px; margin-left: 30px;">Show Results</button></a></div>
+			</div>
+		</div>
+		<div><h5>Progress:</h5>
+			<div id="progress_info">
+				<div class="row">
+					<div class="col-sm-12" style="border:1px solid black;"><h4>Scanning<span id="scanning_count"></span>:</h4></div>
+				</div>
+				<div class="row">
+					<div class="col-sm-12" id="scanning" style="border:1px solid black;"><br/></div>
+				</div>
+				<div class="row">
+					<div class="col-sm-6" style="border:1px solid black;"><h4>Pending<span id="pending_count"></span>:</h4></div>
+					<div class="col-sm-6" style="border:1px solid black;"><h4>Scanned<span id="scanned_count"></span>:</h4></div>
+				</div>
+				<div class="row">
+					<div class="col-sm-6" id="pending" style="border:1px solid black;"></div>
+					<div class="col-sm-6" id="scanned" style="border:1px solid black;"></div>
+				</div>
+				<div class="row">
+					<div class="col-sm-6"><h4>Skipped<span id="skipped_count"></span>:</h4></div>
+					<div class="col-sm-6" id="skipped"></div>								
+				</div>
+			</div>
+		</div>
+	</div>
+
+		
+    <script src="{{url_for('static', filename='assets/js/jquery-3.6.0.min.js')}}"></script>
+    <script src="{{url_for('static', filename='assets/js/bootstrap.bundle.min.js')}}"></script>
+    <script src="{{url_for('static', filename='assets/js/templatemo.js')}}"></script>
+    <script src="{{url_for('static', filename='assets/js/dss.js')}}"></script>
+   	<script>
+		refresh_scan_status("{{ url_for('scanning', scan_num=scan_num, _external=True) }}");
+
+	   	setInterval(function(){
+   			refresh_scan_status("{{ url_for('scanning', scan_num=scan_num, _external=True) }}");
+   		}, 5000);
+   	</script>
+   
+</body>
+</html>

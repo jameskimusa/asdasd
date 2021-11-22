@@ -1,0 +1,200 @@
+@import url(https://fonts.googleapis.com/css?family=Open+Sans);
+
+
+body {
+      padding: 0;
+      margin: 0;
+      outline: none;
+      font-family: Roboto, Arial, sans-serif;
+      font-size: 14px;
+      color: #665;
+      line-height: 22px;
+
+}
+.scanner {
+      width: calc(100% - 10px);
+      padding: 5px;
+      }
+      select {
+      width: 100%;
+      padding: 7px 0;
+      background: transparent;
+
+}
+
+
+.scanner input {
+      width: calc(100% - 10px);
+      padding: 5px;
+      }
+      select {
+      width: 100%;
+      padding: 7px 0;
+      background: transparent;
+}
+
+input[type="checkbox"] {
+  width: auto;
+}
+
+input[type="radio"] {
+  width: auto;
+}
+
+.gitwrap{
+  text-align: right;
+}
+
+.gitscan_form{
+  text-align: left;
+}
+
+.gitscan_form_temp{
+  text-align: left;
+}
+
+#btn_email_config {
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+/*
+.scanner form button {
+  position: relative;
+  display: inline-block;
+  padding: 10px 20px;
+  color: #000000; color: #03e9f4;
+  font-size: 16px;
+  text-decoration: none;
+  text-transform: uppercase;
+  overflow: hidden;
+  transition: .5s;
+  margin-top: 40px;
+  letter-spacing: 4px
+}
+
+.scanner form button:hover {
+  background: #03e9f4;
+  color: #fff;
+  border-radius: 5px;
+  box-shadow: 0 0 5px #03e9f4,
+              0 0 25px #03e9f4,
+              0 0 50px #03e9f4,
+              0 0 100px #03e9f4;
+}
+
+.scanner form button span {
+  position: absolute;
+  display: block;
+}
+
+*/
+
+.scanner form button span {
+  position: absolute;
+  display: block;
+}
+
+#result_head{
+  text-align: center;
+}
+
+#download{
+  text-align: center;
+}
+
+.results button {
+	position: relative;
+}
+
+.results {
+	position: relative;
+	width: 100%;
+  margin: auto;
+	padding: 10px;
+  padding-top: 25px;
+}
+
+.results table, th, td {
+  font-family: arial, sans-serif;
+  border: 1px solid #dddddd;
+  border-collapse: collapse;
+  text-align: left;
+}
+.results th, td {
+  padding: 15px;
+  text-align: left;
+}
+.results tr:nth-child(even) {
+  background-color: #eee;
+}
+.results tr:nth-child(odd) {
+ background-color: #fff;
+}
+.results th {
+  background-color: black;
+  color: white;
+}
+
+.findings{
+  margin: 30px;
+  padding: 15px;
+  margin-top: 5px;
+}
+
+input[type=text], select {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+input[type=password], select {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+textarea {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+input[type=submit] {
+  width: 100%;
+  background-color: #4CAF50;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+input[type=submit]:hover {
+  background-color: #45a049;
+}
+
+ div[id=form2] {
+  border-radius: 5px;
+  background-color: #f2f2f2;
+  padding: 20px;
+  box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.2)
+}
+
+/* Previous results */
+.prevres th {
+  color: black;
+}
